@@ -1,0 +1,33 @@
+# where image builder will contact the Proxmox-API
+export  PROXMOX_URL="https://pve002.irminsul:8006/api2/json"
+
+# network interface the VM will use
+export PROXMOX_BRIDGE="vmbr0"
+
+# where the VM will run
+export PROXMOX_NODE="pve002"
+
+# where the base VM image will be stored
+# isos can not be stored on rbd
+# https://forum.proxmox.com/threads/isos-on-rbd.18031/
+export PROXMOX_ISO_POOL="pve001-nfs-general"
+
+# where the building-VM and the resulting template will be stored
+export PROXMOX_STORAGE_POOL="ceph_ssd_replicated"
+
+# visiting here
+# https://build.opensuse.org/project/subprojects/isv:kubernetes:core:stable
+# we can find the repository for each version, such as here
+# https://build.opensuse.org/repositories/isv:kubernetes:core:stable:v1.30
+# by visiting the published deb repository, we can visit the download repo here
+# https://download.opensuse.org/repositories/isv:/kubernetes:/core:/stable:/v1.30/deb/amd64/
+# and that is where the funny extra version in the deb packages is derived from
+# see also https://image-builder.sigs.k8s.io/capi/providers/proxmox#configuration
+# The full list of available environment vars can be found in the variables section of images/capi/packer/proxmox/packer.json
+export PACKER_FLAGS="--var 'kubernetes_semver=v1.30.11' --var 'kubernetes_series=v1.30' --var 'kubernetes_deb_version=1.30.11-1.1'"
+
+# increase the building VMs memory, so we have some breathing room
+export PACKER_FLAGS="$PACKER_FLAGS --var memory=8192"
+
+# set a custom name
+export PACKER_FLAGS="$PACKER_FLAGS --var artifact_name=kube-template-v1.30.11"
