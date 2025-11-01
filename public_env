@@ -24,7 +24,7 @@ export PROXMOX_STORAGE_POOL="ceph_ssd_replicated"
 # and that is where the funny extra version in the deb packages is derived from
 # see also https://image-builder.sigs.k8s.io/capi/providers/proxmox#configuration
 # The full list of available environment vars can be found in the variables section of images/capi/packer/proxmox/packer.json.tmpl
-export PACKER_FLAGS="--var 'kubernetes_semver=v1.31.11' --var 'kubernetes_series=v1.31' --var 'kubernetes_deb_version=1.31.11-1.1'"
+export PACKER_FLAGS="--var 'kubernetes_semver=v1.32.9' --var 'kubernetes_series=v1.32' --var 'kubernetes_deb_version=1.32.9-1.1'"
 
 # increase the building VMs memory available resources so we have some breathing room
 export PACKER_FLAGS="$PACKER_FLAGS --var memory=8192 --var cpus=4"
@@ -39,4 +39,4 @@ export PACKER_FLAGS="$PACKER_FLAGS --var memory=8192 --var cpus=4"
 export PACKER_FLAGS="$PACKER_FLAGS --var cpu_type=x86-64-v3"
 
 # set a custom name
-export PACKER_FLAGS="$PACKER_FLAGS --var artifact_name=kube-template-v1.31.11"
+export PACKER_FLAGS="$PACKER_FLAGS --var artifact_name=kube-template-v1.32.9"
