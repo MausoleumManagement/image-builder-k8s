@@ -1,6 +1,12 @@
 # where image builder will contact the Proxmox-API
 export PROXMOX_URL="https://pve020.irminsul:8006/api2/json"
 
+# fetch secrets from openbao
+BAO_SECRET_PATH="kv/general/image-builder/proxmox-credentials"
+export PROXMOX_USERNAME=$(bao kv get -field=PROXMOX_USERNAME "$BAO_SECRET_PATH")
+export PROXMOX_TOKEN=$(bao kv get -field=PROXMOX_TOKEN "$BAO_SECRET_PATH")
+
+
 # network interface the VM will use
 export PROXMOX_BRIDGE="vmbr0"
 

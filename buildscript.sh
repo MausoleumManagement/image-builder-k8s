@@ -2,7 +2,6 @@
 set -euxo pipefail
 
 source public_env
-source secret_env
 
 cd ./image-builder/images/capi
 
