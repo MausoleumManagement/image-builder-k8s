@@ -40,3 +40,7 @@ export PACKER_FLAGS="$PACKER_FLAGS --var cpu_type=x86-64-v3"
 
 # set a custom name
 export PACKER_FLAGS="$PACKER_FLAGS --var artifact_name=kube-template-v1.33.7"
+
+# packer seems to mask certain errors unless you turn on
+# detailed logging...
+export PACKER_LOG="1"
