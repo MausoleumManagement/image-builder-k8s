@@ -1,9 +1,27 @@
-K8S_MINOR=v1.35
-K8S_BUGFIX=v1.35.3
+# packer will reupload the image to proxmox every time
+# annoying during debugging because we use normal hdds to store images
+# ubuntu-2404.json hardcodes iso_url; so exporting ISO_FILE alone results in two ISO sources
+# which makes the packer proxmox plugin choke; hence we override iso_url as well                                                                                                         │# see https://github.com/hashicorp/packer-plugin-proxmox/blob/a65d8836b544b8f4224469b98db9d4d9a2200bdf/builder/proxmox/iso/config.go#L166
+# this must obviously be unset whenever we start using a new image
+#export ISO_FILE="pve022-nfs-general:iso/ubuntu-24.04.4-live-server-amd64.iso"
+#export PACKER_FLAGS="--var iso_url="
 
+
+# visiting here
+# https://build.opensuse.org/project/subprojects/isv:kubernetes:core:stable
+# we can find the repository for each version, such as here
+# https://build.opensuse.org/repositories/isv:kubernetes:core:stable:v1.30
+# by visiting the published deb repository, we can visit the download repo here
+# https://download.opensuse.org/repositories/isv:/kubernetes:/core:/stable:/v1.30/deb/amd64/
+# and that is where the funny extra version in the deb packages is derived from
+# see also https://image-builder.sigs.k8s.io/capi/providers/proxmox#configuration
+
+K8S_BUGFIX=v1.35.9
+K8S_MINOR=v1.35
+K8S_DEB_VERSION=1.35.9-1.1
 
 # where image builder will contact the Proxmox-API
-export PROXMOX_URL="https://pve020.irminsul:8006/api2/json"
+export PROXMOX_URL="https://pve022.irminsul:8006/api2/json"
 
 # fetch secrets from openbao
 BAO_SECRET_PATH="kv/general/image-builder/proxmox-credentials"
@@ -14,7 +32,7 @@ export PROXMOX_TOKEN=$(bao kv get -field=PROXMOX_TOKEN "$BAO_SECRET_PATH")
 export PROXMOX_BRIDGE="vmbr0"
 
 # where the VM will run
-export PROXMOX_NODE="pve020"
+export PROXMOX_NODE="pve022"
 
 # where the base VM image will be stored
 # isos can not be stored on rbd
@@ -24,16 +42,8 @@ export PROXMOX_ISO_POOL="pve022-nfs-general"
 # where the building-VM and the resulting template will be stored
 export PROXMOX_STORAGE_POOL="ceph_ssd_replicated"
 
-# visiting here
-# https://build.opensuse.org/project/subprojects/isv:kubernetes:core:stable
-# we can find the repository for each version, such as here
-# https://build.opensuse.org/repositories/isv:kubernetes:core:stable:v1.30
-# by visiting the published deb repository, we can visit the download repo here
-# https://download.opensuse.org/repositories/isv:/kubernetes:/core:/stable:/v1.30/deb/amd64/
-# and that is where the funny extra version in the deb packages is derived from
-# see also https://image-builder.sigs.k8s.io/capi/providers/proxmox#configuration
 # The full list of available environment vars can be found in the variables section of images/capi/packer/proxmox/packer.json.tmpl
-export PACKER_FLAGS="--var 'kubernetes_semver=$K8S_BUGFIX' --var 'kubernetes_series=$K8S_MINOR'"
+export PACKER_FLAGS="$PACKER_FLAGS --var 'kubernetes_semver=$K8S_BUGFIX' --var 'kubernetes_series=$K8S_MINOR' --var 'kubernetes_deb_version=$K8S_DEB_VERSION'"
 
 # increase the building VMs memory available resources so we have some breathing room
 export PACKER_FLAGS="$PACKER_FLAGS --var memory=8192 --var cpus=4"
