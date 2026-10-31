@@ -2,7 +2,7 @@
 
 # https://image-builder.sigs.k8s.io/capi/providers/openstack
 
-set -euo pipefail
+set -euxo pipefail
 
 . ./public_env_generic
 
@@ -18,8 +18,8 @@ cd ./image-builder/images/capi
 #make deps-qemu
 #make build-qemu-${UBUNTU_VERSION}
 # raw
-make deps-raw
-make build-raw-${UBUNTU_VERSION}
+time make deps-raw
+time make build-raw-${UBUNTU_VERSION}
 
 # image will end up in a subdirectory under
 # ./image-builder/images/capi/output
