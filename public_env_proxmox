@@ -1,0 +1,29 @@
+# packer will reupload the image to proxmox every time
+# annoying during debugging because we use normal hdds to store images
+# ubuntu-2404.json hardcodes iso_url; so exporting ISO_FILE alone results in two ISO sources
+# which makes the packer proxmox plugin choke; hence we override iso_url as well                                                                                                         │# see https://github.com/hashicorp/packer-plugin-proxmox/blob/a65d8836b544b8f4224469b98db9d4d9a2200bdf/builder/proxmox/iso/config.go#L166
+# this must obviously be unset whenever we start using a new image
+#export ISO_FILE="pve022-nfs-general:iso/ubuntu-24.04.4-live-server-amd64.iso"
+#export PACKER_FLAGS="--var iso_url="
+
+# where image builder will contact the Proxmox-API
+export PROXMOX_URL="https://pve022.irminsul:8006/api2/json"
+
+# fetch secrets from openbao
+BAO_SECRET_PATH="kv/general/image-builder/proxmox-credentials"
+export PROXMOX_USERNAME=$(bao kv get -field=PROXMOX_USERNAME "$BAO_SECRET_PATH")
+export PROXMOX_TOKEN=$(bao kv get -field=PROXMOX_TOKEN "$BAO_SECRET_PATH")
+
+# network interface the VM will use
+export PROXMOX_BRIDGE="vmbr0"
+
+# where the VM will run
+export PROXMOX_NODE="pve022"
+
+# where the base VM image will be stored
+# isos can not be stored on rbd
+# https://forum.proxmox.com/threads/isos-on-rbd.18031/
+export PROXMOX_ISO_POOL="pve022-nfs-general"
+
+# where the building-VM and the resulting template will be stored
+export PROXMOX_STORAGE_POOL="ceph_ssd_replicated"

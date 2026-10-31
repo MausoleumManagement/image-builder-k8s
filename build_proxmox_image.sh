@@ -1,11 +1,12 @@
 #!/bin/bash
 set -euxo pipefail
 
-source public_env
+source public_env_generic
+source public_env_proxmox
 
 cd ./image-builder/images/capi
 
-time make deps-proxmox
 
 # see supported oses and platforms in image-builder/images/capi/Makefile
-time make build-proxmox-ubuntu-2404
+time make deps-proxmox
+time make build-proxmox-${UBUNTU_VERSION}

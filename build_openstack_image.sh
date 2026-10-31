@@ -11,6 +11,7 @@ cd ./image-builder/images/capi
 # TODO: went with raw because that is slightly more performant, while being less flexible with disk space used
 # also, apprently that allows ceph to instantiate new volumes as copy on write volume clones, which should be faster
 # than writing the whole image
+# https://specs.openstack.org/openstack/nova-specs/specs/victoria/implemented/nova-image-download-via-rbd.html
 # https://www.reddit.com/r/openstack/comments/1d519qx/qcow2_glance_images_with_ceph/
 
 # qcow2
