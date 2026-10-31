@@ -4,10 +4,21 @@
 
 set -euo pipefail
 
+. ./public_env_generic
+
 cd ./image-builder/images/capi
 
-make deps-qemu
-make build-qemu-ubuntu-2604
+# TODO: went with raw because that is slightly more performant, while being less flexible with disk space used
+# also, apprently that allows ceph to instantiate new volumes as copy on write volume clones, which should be faster
+# than writing the whole image
+# https://www.reddit.com/r/openstack/comments/1d519qx/qcow2_glance_images_with_ceph/
 
-# image will end up under
-#image-builder/images/capi/output/ubuntu-2604-kube-v1.36.1/ubuntu-2604-kube-v1.36.1
+# qcow2
+#make deps-qemu
+#make build-qemu-${UBUNTU_VERSION}
+# raw
+make deps-raw
+make build-raw-${UBUNTU_VERSION}
+
+# image will end up in a subdirectory under
+# ./image-builder/images/capi/output

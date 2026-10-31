@@ -1,0 +1,40 @@
+export UBUNTU_VERSION=ubuntu-2604
+
+# visiting here
+# https://build.opensuse.org/project/subprojects/isv:kubernetes:core:stable
+# we can find the repository for each version, such as here
+# https://build.opensuse.org/repositories/isv:kubernetes:core:stable:v1.30
+# by visiting the published deb repository, we can visit the download repo here
+# https://download.opensuse.org/repositories/isv:/kubernetes:/core:/stable:/v1.30/deb/amd64/
+# and that is where the funny extra version in the deb packages is derived from
+# see also https://image-builder.sigs.k8s.io/capi/providers/proxmox#configuration
+
+export K8S_BUGFIX=v1.35.9
+# crictl minor releases follow k8s releases, so 1.35.X K8s goes with 1.35.Y crictl
+# https://github.com/kubernetes-sigs/cri-tools
+export CRICTL_VERSION=1.35.0
+# just pick the first two elements of the version string
+export K8S_MINOR=$(printf $K8S_BUGFIX | grep -o -E '^v[0-9]+\.[0-9]+')
+# the upstream uses this in their github action, so let's save some time there
+export K8S_DEB_VERSION=$(python image-builder/.github/actions/configure-k8s-version/resolve-kubernetes-deb-version.py $K8S_BUGFIX)
+
+
+# There's multiple layers of environment variable defining processing, here's just some of the places 
+# image-builder/images/capi/packer/config/common.json
+# image-builder/images/capi/packer/proxmox/ubuntu-2404.json
+# image-builder/images/capi/packer/proxmox/packer.json
+# image-builder/images/capi/packer/proxmox/packer.json.tmpl
+export PACKER_FLAGS=""
+export PACKER_FLAGS="$PACKER_FLAGS --var 'kubernetes_semver=$K8S_BUGFIX' --var 'kubernetes_series=$K8S_MINOR' --var 'kubernetes_deb_version=$K8S_DEB_VERSION'"
+export PACKER_FLAGS="$PACKER_FLAGS -var 'crictl_version=$CRICTL_VERSION'"
+
+# TODO: does this do anything in the qemu local build?
+# increase the building VMs memory available resources so we have some breathing room
+export PACKER_FLAGS="$PACKER_FLAGS --var memory=8192 --var cpus=4"
+
+# set a custom name
+export PACKER_FLAGS="$PACKER_FLAGS --var artifact_name=kube-template-$K8S_BUGFIX"
+
+# packer seems to mask certain errors unless you turn on
+# detailed logging...
+export PACKER_LOG="1"
